@@ -17,21 +17,27 @@ class StaticLoader:
         if path.suffix not in self.SUPPORTED:
             raise ValueError(f"Unsupported file type: {path.suffix}")
 
-        # DuckDB handles all format detection automatically
-        con  = duckdb.connect()
-        df   = con.execute(f"SELECT * FROM read_auto('{file_path}')").pl()
+        con = duckdb.connect()
+        df  = con.execute(f"SELECT * FROM {self._reader(path)}('{file_path}')").pl()
         con.close()
         return df
 
     def load_sample(self, file_path: str, n: int = 10_000) -> pl.DataFrame:
-        """Fast sample for profiling — doesn't load the full file."""
-        con = duckdb.connect()
-        df  = con.execute(
-            f"SELECT * FROM read_auto('{file_path}') USING SAMPLE {n} ROWS"
+        path = Path(file_path)
+        con  = duckdb.connect()
+        df   = con.execute(
+            f"SELECT * FROM {self._reader(path)}('{file_path}') USING SAMPLE {n} ROWS"
         ).pl()
         con.close()
         return df
 
+    def _reader(self, path: Path) -> str:
+        return {
+            ".csv":     "read_csv_auto",
+            ".json":    "read_json_auto",
+            ".jsonl":   "read_json_auto",
+            ".parquet": "read_parquet",
+        }.get(path.suffix.lower(), "read_csv_auto")
 
 class LiveStreamLoader:
     """
