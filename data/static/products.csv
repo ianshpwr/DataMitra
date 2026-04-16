@@ -1,0 +1,301 @@
+product_id,product_name,category,sub_category,cost_price,selling_price,stock_quantity,supplier_id
+P0001,Laptop Street,Electronics,Laptop,372.07,564.94,71,SUP024
+P0002,Camera Side,Electronics,Camera,48.03,83.98,15,SUP003
+P0003,Jeans Throw,Clothing,Jeans,255.15,314.98,101,SUP023
+P0004,Comic Foreign,Books,Comic,114.12,224.37,414,SUP028
+P0005,Phone Language,Electronics,Phone,350.58,575.77,79,SUP007
+P0006,Sofa Sit,Home,Sofa,50.91,67.49,433,SUP012
+P0007,Textbook Walk,Books,Textbook,404.53,869.19,274,SUP004
+P0008,Yoga Mat Day,Sports,Yoga Mat,278.26,633.94,316,SUP029
+P0009,Frame Enter,Home,Frame,100.18,129.27,338,SUP008
+P0010,Sofa Factor,Home,Sofa,428.38,996.6,194,SUP009
+P0011,Running Shoes Crime,Sports,Running Shoes,85.51,142.1,343,SUP009
+P0012,Camera Surface,Electronics,Camera,319.31,604.9,125,SUP006
+P0013,Bottle Fly,Sports,Bottle,138.62,333.11,352,SUP018
+P0014,Jacket Production,Clothing,Jacket,422.21,932.58,117,SUP027
+P0015,Tablet Accept,Electronics,Tablet,203.58,261.81,467,SUP019
+P0016,Lamp Whom,Home,Lamp,329.44,564.77,468,SUP021
+P0017,Dumbbells Best,Sports,Dumbbells,136.12,206.99,287,SUP018
+P0018,Frame Social,Home,Frame,217.07,425.15,185,SUP008
+P0019,Dress Special,Clothing,Dress,249.29,544.08,440,SUP004
+P0020,Jeans Two,Clothing,Jeans,397.08,694.42,32,SUP013
+P0021,Bottle Herself,Sports,Bottle,266.91,657.24,440,SUP001
+P0022,Camera Fly,Electronics,Camera,376.68,828.39,174,SUP004
+P0023,Pillow Exist,Home,Pillow,83.29,100.3,369,SUP029
+P0024,Frame Book,Home,Frame,382.17,710.83,54,SUP028
+P0025,Frame Phone,Home,Frame,306.44,428.61,390,SUP006
+P0026,Fiction Include,Books,Fiction,301.48,553.27,57,SUP030
+P0027,Rug Professional,Home,Rug,123.53,186.92,290,SUP003
+P0028,Headphones According,Electronics,Headphones,408.93,1010.62,272,SUP025
+P0029,Jeans Speech,Clothing,Jeans,331.58,806.04,84,SUP009
+P0030,Comic Career,Books,Comic,482.36,1161.32,386,SUP024
+P0031,Jacket Often,Clothing,Jacket,202.5,419.82,191,SUP015
+P0032,Comic Man,Books,Comic,64.9,96.84,173,SUP001
+P0033,Non-Fiction Memory,Books,Non-Fiction,296.28,358.31,362,SUP021
+P0034,Phone Wide,Electronics,Phone,38.36,47.6,169,SUP003
+P0035,Non-Fiction Save,Books,Non-Fiction,142.85,261.56,276,SUP005
+P0036,Comic Feeling,Books,Comic,125.28,227.37,208,SUP007
+P0037,Laptop Far,Electronics,Laptop,331.2,549.99,210,SUP015
+P0038,Laptop Car,Electronics,Laptop,35.0,75.13,409,SUP028
+P0039,Phone Image,Electronics,Phone,99.84,189.41,71,SUP014
+P0040,Jacket Red,Clothing,Jacket,234.0,546.82,38,SUP015
+P0041,Fiction Half,Books,Fiction,30.04,75.07,428,SUP001
+P0042,Phone Ready,Electronics,Phone,87.32,159.91,109,SUP028
+P0043,Yoga Mat Area,Sports,Yoga Mat,86.5,104.04,199,SUP009
+P0044,Running Shoes Month,Sports,Running Shoes,214.39,524.08,401,SUP018
+P0045,Dumbbells Security,Sports,Dumbbells,99.0,146.82,29,SUP019
+P0046,Fiction Time,Books,Fiction,375.25,478.19,299,SUP016
+P0047,Non-Fiction Practice,Books,Non-Fiction,33.16,61.68,435,SUP006
+P0048,Camera Born,Electronics,Camera,38.64,89.66,206,SUP004
+P0049,Non-Fiction Receive,Books,Non-Fiction,291.56,364.94,41,SUP014
+P0050,Textbook Sound,Books,Textbook,467.68,685.4,366,SUP011
+P0051,Jacket Gun,Clothing,Jacket,200.91,416.53,153,SUP015
+P0052,Sofa Fight,Home,Sofa,9.61,19.29,288,SUP004
+P0053,Camera Record,Electronics,Camera,110.51,170.71,477,SUP012
+P0054,Phone Rather,Electronics,Phone,187.92,264.04,426,SUP018
+P0055,Frame Civil,Home,Frame,492.01,1106.64,270,SUP001
+P0056,Textbook Gas,Books,Textbook,466.22,622.25,449,SUP005
+P0057,Sofa Argue,Home,Sofa,445.41,964.38,79,SUP009
+P0058,Frame Player,Home,Frame,109.26,179.81,351,SUP021
+P0059,Frame Paper,Home,Frame,246.82,586.68,433,SUP002
+P0060,Headphones Old,Electronics,Headphones,415.53,522.45,170,SUP025
+P0061,Jacket Play,Clothing,Jacket,84.98,150.79,361,SUP014
+P0062,Fiction Reduce,Books,Fiction,60.38,146.64,353,SUP029
+P0063,Dress Pm,Clothing,Dress,22.83,38.35,282,SUP005
+P0064,Dumbbells One,Sports,Dumbbells,25.71,43.04,477,SUP026
+P0065,Tablet Democrat,Electronics,Tablet,108.99,166.14,52,SUP012
+P0066,Comic Surface,Books,Comic,487.05,1059.0,473,SUP030
+P0067,Jeans Vote,Clothing,Jeans,488.22,1100.45,451,SUP014
+P0068,Phone Wait,Electronics,Phone,369.6,603.13,476,SUP014
+P0069,Jacket Land,Clothing,Jacket,83.8,176.96,195,SUP028
+P0070,Headphones Capital,Electronics,Headphones,115.1,260.31,235,SUP012
+P0071,Lamp Think,Home,Lamp,115.35,237.4,204,SUP011
+P0072,Sofa Candidate,Home,Sofa,483.61,755.82,328,SUP017
+P0073,Running Shoes Important,Sports,Running Shoes,469.92,634.37,496,SUP009
+P0074,Dress Interest,Clothing,Dress,481.45,743.89,55,SUP020
+P0075,Running Shoes Recently,Sports,Running Shoes,365.63,587.85,310,SUP017
+P0076,Headphones Way,Electronics,Headphones,450.25,651.56,22,SUP023
+P0077,Yoga Mat It,Sports,Yoga Mat,262.36,589.91,351,SUP024
+P0078,Jacket Instead,Clothing,Jacket,218.49,531.7,471,SUP011
+P0079,Textbook Measure,Books,Textbook,333.38,454.07,460,SUP010
+P0080,Textbook Standard,Books,Textbook,335.11,544.23,356,SUP010
+P0081,Non-Fiction To,Books,Non-Fiction,99.96,206.36,194,SUP022
+P0082,Dress Job,Clothing,Dress,286.71,495.41,426,SUP001
+P0083,Rug Quite,Home,Rug,109.04,242.23,310,SUP021
+P0084,Pillow Represent,Home,Pillow,223.68,464.88,261,SUP016
+P0085,T-Shirt Wind,Clothing,T-Shirt,145.47,300.11,317,SUP011
+P0086,Phone Time,Electronics,Phone,338.03,504.35,101,SUP005
+P0087,Laptop Meet,Electronics,Laptop,126.2,229.39,435,SUP025
+P0088,Headphones Offer,Electronics,Headphones,210.15,424.23,99,SUP023
+P0089,Bottle Total,Sports,Bottle,202.83,282.31,352,SUP001
+P0090,Headphones Thousand,Electronics,Headphones,113.33,254.46,356,SUP017
+P0091,Yoga Mat Speak,Sports,Yoga Mat,280.92,672.16,62,SUP015
+P0092,Shoes End,Clothing,Shoes,335.45,833.35,304,SUP011
+P0093,Bottle Machine,Sports,Bottle,416.13,795.74,459,SUP006
+P0094,Bottle Detail,Sports,Bottle,133.3,202.8,326,SUP009
+P0095,Comic News,Books,Comic,315.24,490.82,39,SUP023
+P0096,Lamp Same,Home,Lamp,139.5,225.38,276,SUP003
+P0097,Jeans Agree,Clothing,Jeans,119.47,251.14,361,SUP007
+P0098,Headphones Election,Electronics,Headphones,206.76,393.96,212,SUP002
+P0099,Shoes Charge,Clothing,Shoes,197.79,435.28,484,SUP023
+P0100,Camera Mission,Electronics,Camera,193.29,233.43,180,SUP010
+P0101,Bottle Join,Sports,Bottle,271.42,584.92,409,SUP020
+P0102,Shoes Add,Clothing,Shoes,113.61,200.7,14,SUP013
+P0103,Pillow Short,Home,Pillow,363.47,833.31,470,SUP005
+P0104,Fiction Change,Books,Fiction,453.93,894.0,339,SUP001
+P0105,Headphones Store,Electronics,Headphones,72.17,129.92,25,SUP009
+P0106,Running Shoes Floor,Sports,Running Shoes,109.77,178.37,389,SUP029
+P0107,Running Shoes Small,Sports,Running Shoes,377.24,860.67,129,SUP027
+P0108,Headphones Approach,Electronics,Headphones,14.59,27.74,487,SUP012
+P0109,T-Shirt Officer,Clothing,T-Shirt,391.71,801.94,386,SUP001
+P0110,Jeans Strategy,Clothing,Jeans,420.42,844.09,122,SUP005
+P0111,Yoga Mat Position,Sports,Yoga Mat,284.16,421.51,358,SUP009
+P0112,Lamp Training,Home,Lamp,304.92,747.92,367,SUP004
+P0113,Jacket Peace,Clothing,Jacket,58.51,72.17,159,SUP019
+P0114,Bottle Soon,Sports,Bottle,471.03,686.68,303,SUP023
+P0115,T-Shirt House,Clothing,T-Shirt,350.11,557.4,350,SUP020
+P0116,Camera Political,Electronics,Camera,392.4,648.0,219,SUP022
+P0117,Sofa Son,Home,Sofa,255.45,419.86,434,SUP014
+P0118,Yoga Mat Occur,Sports,Yoga Mat,219.59,366.9,456,SUP027
+P0119,Dumbbells Usually,Sports,Dumbbells,220.57,475.09,494,SUP021
+P0120,Frame Put,Home,Frame,405.06,769.46,247,SUP015
+P0121,Running Shoes Give,Sports,Running Shoes,164.54,249.96,478,SUP003
+P0122,Pillow Attorney,Home,Pillow,125.71,226.8,312,SUP022
+P0123,Running Shoes Artist,Sports,Running Shoes,19.21,44.3,93,SUP016
+P0124,Jacket Land,Clothing,Jacket,399.93,656.86,450,SUP020
+P0125,Frame Against,Home,Frame,10.02,24.37,43,SUP008
+P0126,Bottle Government,Sports,Bottle,279.81,423.19,243,SUP021
+P0127,Bottle Activity,Sports,Bottle,397.5,525.09,113,SUP013
+P0128,Jacket Walk,Clothing,Jacket,333.66,560.46,283,SUP017
+P0129,Pillow Likely,Home,Pillow,498.33,954.55,180,SUP023
+P0130,Running Shoes Truth,Sports,Running Shoes,156.78,235.12,369,SUP007
+P0131,Sofa Since,Home,Sofa,372.73,908.02,353,SUP006
+P0132,Jeans Her,Clothing,Jeans,370.61,577.95,301,SUP025
+P0133,Textbook Future,Books,Textbook,490.35,1119.18,151,SUP008
+P0134,Lamp Billion,Home,Lamp,154.62,327.86,64,SUP009
+P0135,Laptop Major,Electronics,Laptop,278.91,587.56,64,SUP021
+P0136,Yoga Mat Seem,Sports,Yoga Mat,437.0,850.53,240,SUP016
+P0137,Running Shoes Him,Sports,Running Shoes,96.26,121.94,481,SUP028
+P0138,Yoga Mat Expect,Sports,Yoga Mat,411.95,708.93,37,SUP019
+P0139,Phone Wear,Electronics,Phone,78.85,152.31,155,SUP003
+P0140,T-Shirt Set,Clothing,T-Shirt,281.25,489.66,305,SUP026
+P0141,Non-Fiction Hotel,Books,Non-Fiction,388.97,659.11,465,SUP015
+P0142,Frame Approach,Home,Frame,495.07,790.62,317,SUP002
+P0143,Fiction Area,Books,Fiction,474.06,696.93,108,SUP009
+P0144,Phone Tell,Electronics,Phone,123.73,237.26,80,SUP001
+P0145,Bottle Resource,Sports,Bottle,346.24,627.0,16,SUP008
+P0146,Rug National,Home,Rug,352.98,631.92,351,SUP008
+P0147,Frame Early,Home,Frame,332.29,802.07,217,SUP004
+P0148,Non-Fiction Arm,Books,Non-Fiction,325.58,775.18,423,SUP005
+P0149,Laptop Direction,Electronics,Laptop,87.13,139.4,383,SUP027
+P0150,Textbook Soon,Books,Textbook,222.38,402.35,155,SUP023
+P0151,Running Shoes Forward,Sports,Running Shoes,252.73,465.51,41,SUP020
+P0152,Headphones Force,Electronics,Headphones,368.59,731.59,13,SUP003
+P0153,Dress Operation,Clothing,Dress,295.63,362.73,391,SUP022
+P0154,Frame Success,Home,Frame,24.91,54.38,240,SUP017
+P0155,Running Shoes Amount,Sports,Running Shoes,94.84,185.97,325,SUP027
+P0156,Yoga Mat Employee,Sports,Yoga Mat,237.66,411.35,164,SUP022
+P0157,Phone Friend,Electronics,Phone,168.25,353.62,147,SUP022
+P0158,Yoga Mat Season,Sports,Yoga Mat,230.14,370.27,165,SUP004
+P0159,Yoga Mat Back,Sports,Yoga Mat,330.54,629.8,211,SUP002
+P0160,Dress Campaign,Clothing,Dress,184.08,401.92,320,SUP015
+P0161,Phone Allow,Electronics,Phone,137.19,187.99,147,SUP015
+P0162,Yoga Mat Other,Sports,Yoga Mat,19.29,38.95,409,SUP008
+P0163,Jacket Boy,Clothing,Jacket,277.67,532.55,47,SUP008
+P0164,Headphones Despite,Electronics,Headphones,473.8,967.51,78,SUP016
+P0165,Frame Material,Home,Frame,354.18,616.32,247,SUP016
+P0166,Shoes Now,Clothing,Shoes,277.88,472.02,471,SUP020
+P0167,Non-Fiction Than,Books,Non-Fiction,432.69,674.62,404,SUP028
+P0168,Running Shoes Order,Sports,Running Shoes,467.45,869.48,420,SUP001
+P0169,Rug Many,Home,Rug,419.55,819.76,337,SUP016
+P0170,Shoes Grow,Clothing,Shoes,271.6,447.78,282,SUP025
+P0171,Comic Goal,Books,Comic,230.4,372.86,96,SUP023
+P0172,Dress Surface,Clothing,Dress,194.57,450.0,210,SUP002
+P0173,Pillow Moment,Home,Pillow,354.09,798.41,197,SUP022
+P0174,Shoes Nearly,Clothing,Shoes,482.59,658.31,494,SUP019
+P0175,Sofa Often,Home,Sofa,437.72,775.81,269,SUP030
+P0176,Yoga Mat From,Sports,Yoga Mat,362.61,628.39,335,SUP005
+P0177,Headphones Go,Electronics,Headphones,391.86,605.24,319,SUP023
+P0178,Yoga Mat Light,Sports,Yoga Mat,426.62,984.66,439,SUP018
+P0179,Running Shoes Whose,Sports,Running Shoes,315.27,742.04,249,SUP028
+P0180,Fiction Option,Books,Fiction,310.64,467.58,350,SUP030
+P0181,Lamp Science,Home,Lamp,374.65,660.94,50,SUP025
+P0182,Headphones Federal,Electronics,Headphones,87.35,138.83,14,SUP002
+P0183,Sofa Measure,Home,Sofa,150.22,253.47,74,SUP008
+P0184,Comic Friend,Books,Comic,285.13,635.92,87,SUP006
+P0185,Camera Situation,Electronics,Camera,436.07,874.59,123,SUP016
+P0186,Non-Fiction Usually,Books,Non-Fiction,119.93,243.37,235,SUP009
+P0187,Headphones Arrive,Electronics,Headphones,451.1,938.69,80,SUP003
+P0188,Running Shoes Trial,Sports,Running Shoes,493.89,784.74,492,SUP014
+P0189,Pillow They,Home,Pillow,423.43,617.78,196,SUP028
+P0190,Yoga Mat Resource,Sports,Yoga Mat,122.42,237.92,294,SUP010
+P0191,Sofa Money,Home,Sofa,489.08,1005.4,140,SUP001
+P0192,Fiction Much,Books,Fiction,455.76,988.42,426,SUP029
+P0193,Lamp Chance,Home,Lamp,305.5,506.52,325,SUP007
+P0194,Textbook Site,Books,Textbook,340.49,727.7,337,SUP022
+P0195,T-Shirt Put,Clothing,T-Shirt,452.18,922.56,158,SUP026
+P0196,Yoga Mat Fast,Sports,Yoga Mat,291.89,628.17,46,SUP030
+P0197,Rug Mind,Home,Rug,375.0,535.62,67,SUP026
+P0198,Textbook Born,Books,Textbook,267.77,639.31,425,SUP006
+P0199,Pillow Southern,Home,Pillow,483.86,766.28,445,SUP011
+P0200,Headphones Model,Electronics,Headphones,481.63,666.09,494,SUP008
+P0201,Running Shoes Gun,Sports,Running Shoes,49.7,85.13,135,SUP018
+P0202,Headphones Only,Electronics,Headphones,187.45,407.46,134,SUP019
+P0203,Running Shoes Table,Sports,Running Shoes,58.63,88.18,12,SUP020
+P0204,Textbook Plan,Books,Textbook,458.05,681.48,32,SUP021
+P0205,Running Shoes Shake,Sports,Running Shoes,326.37,441.15,23,SUP002
+P0206,Pillow First,Home,Pillow,62.48,94.05,275,SUP005
+P0207,Bottle Marriage,Sports,Bottle,188.65,459.21,356,SUP018
+P0208,Dumbbells Wait,Sports,Dumbbells,443.28,909.34,426,SUP016
+P0209,Comic Letter,Books,Comic,469.83,734.66,353,SUP012
+P0210,Shoes Others,Clothing,Shoes,225.12,339.24,185,SUP004
+P0211,Frame Share,Home,Frame,451.34,919.95,31,SUP013
+P0212,Lamp Day,Home,Lamp,484.26,1178.55,421,SUP015
+P0213,Phone Attorney,Electronics,Phone,322.64,637.63,10,SUP002
+P0214,Lamp Sea,Home,Lamp,494.47,1099.24,105,SUP003
+P0215,Non-Fiction Represent,Books,Non-Fiction,295.26,666.39,119,SUP011
+P0216,Dress Fear,Clothing,Dress,6.4,14.82,74,SUP005
+P0217,Textbook Cup,Books,Textbook,400.26,537.51,443,SUP001
+P0218,T-Shirt Force,Clothing,T-Shirt,182.33,405.68,301,SUP011
+P0219,Phone Accept,Electronics,Phone,136.36,186.1,215,SUP017
+P0220,Laptop Stop,Electronics,Laptop,240.74,532.38,262,SUP019
+P0221,Headphones Drive,Electronics,Headphones,254.4,617.95,22,SUP024
+P0222,Textbook Anything,Books,Textbook,231.73,568.49,31,SUP016
+P0223,Bottle Support,Sports,Bottle,344.62,633.19,465,SUP015
+P0224,Laptop Policy,Electronics,Laptop,164.45,229.05,64,SUP009
+P0225,Textbook Debate,Books,Textbook,193.55,382.57,150,SUP015
+P0226,Comic Heavy,Books,Comic,54.09,114.26,436,SUP021
+P0227,Non-Fiction Day,Books,Non-Fiction,217.88,513.0,211,SUP011
+P0228,Bottle Enter,Sports,Bottle,210.91,279.16,218,SUP011
+P0229,Rug Style,Home,Rug,477.03,998.36,242,SUP003
+P0230,Laptop Impact,Electronics,Laptop,51.15,67.8,378,SUP012
+P0231,Dress Win,Clothing,Dress,34.69,84.77,287,SUP011
+P0232,Headphones While,Electronics,Headphones,180.03,371.75,384,SUP014
+P0233,Tablet Ground,Electronics,Tablet,302.2,500.79,295,SUP017
+P0234,Jeans Pretty,Clothing,Jeans,330.08,492.32,55,SUP012
+P0235,Textbook Allow,Books,Textbook,61.87,96.65,115,SUP026
+P0236,Yoga Mat Glass,Sports,Yoga Mat,306.45,629.81,355,SUP009
+P0237,Phone Research,Electronics,Phone,140.27,307.35,471,SUP011
+P0238,Sofa That,Home,Sofa,94.8,131.41,336,SUP013
+P0239,Phone Generation,Electronics,Phone,371.78,915.83,46,SUP024
+P0240,Non-Fiction System,Books,Non-Fiction,191.22,342.23,80,SUP012
+P0241,Rug Generation,Home,Rug,389.53,754.86,43,SUP029
+P0242,Phone Above,Electronics,Phone,82.92,166.1,345,SUP003
+P0243,Pillow Prepare,Home,Pillow,332.66,609.22,226,SUP014
+P0244,Lamp Project,Home,Lamp,378.7,510.47,220,SUP004
+P0245,Frame Water,Home,Frame,245.88,508.3,23,SUP008
+P0246,Yoga Mat Seven,Sports,Yoga Mat,8.81,14.02,108,SUP025
+P0247,Jacket Stuff,Clothing,Jacket,148.28,201.06,254,SUP024
+P0248,Dumbbells Tree,Sports,Dumbbells,68.95,130.48,117,SUP017
+P0249,Textbook Control,Books,Textbook,40.68,94.39,21,SUP014
+P0250,Headphones Response,Electronics,Headphones,460.98,1069.82,294,SUP014
+P0251,Comic Product,Books,Comic,356.2,620.86,58,SUP013
+P0252,Tablet Thus,Electronics,Tablet,90.08,219.07,235,SUP027
+P0253,Sofa Nothing,Home,Sofa,221.17,295.84,223,SUP019
+P0254,Yoga Mat Run,Sports,Yoga Mat,200.9,322.11,173,SUP008
+P0255,Lamp Theory,Home,Lamp,42.81,86.61,271,SUP017
+P0256,Jacket Ask,Clothing,Jacket,178.79,437.26,330,SUP027
+P0257,Jeans State,Clothing,Jeans,55.89,85.67,88,SUP020
+P0258,T-Shirt Opportunity,Clothing,T-Shirt,92.69,204.35,252,SUP015
+P0259,Comic Day,Books,Comic,342.16,802.93,329,SUP021
+P0260,Textbook Push,Books,Textbook,432.8,872.26,77,SUP015
+P0261,Headphones True,Electronics,Headphones,223.89,356.81,140,SUP019
+P0262,Tablet Approach,Electronics,Tablet,256.13,410.71,231,SUP002
+P0263,Tablet Forget,Electronics,Tablet,416.69,541.59,442,SUP028
+P0264,Camera Majority,Electronics,Camera,299.07,508.37,297,SUP018
+P0265,Headphones Democratic,Electronics,Headphones,454.98,884.1,96,SUP011
+P0266,Comic Break,Books,Comic,253.18,619.03,230,SUP004
+P0267,Sofa First,Home,Sofa,254.75,362.85,126,SUP023
+P0268,Bottle Describe,Sports,Bottle,264.41,526.9,186,SUP012
+P0269,Pillow Hand,Home,Pillow,207.34,340.01,306,SUP002
+P0270,Sofa Occur,Home,Sofa,168.2,323.84,197,SUP010
+P0271,Frame Material,Home,Frame,437.27,714.22,298,SUP022
+P0272,Jacket Rest,Clothing,Jacket,158.56,325.5,339,SUP013
+P0273,Dress Talk,Clothing,Dress,355.87,466.24,286,SUP013
+P0274,Lamp Performance,Home,Lamp,336.71,766.91,378,SUP022
+P0275,Fiction Level,Books,Fiction,324.78,568.5,185,SUP001
+P0276,Rug Range,Home,Rug,94.23,139.31,485,SUP025
+P0277,Dumbbells Hold,Sports,Dumbbells,117.14,161.52,39,SUP010
+P0278,Camera Entire,Electronics,Camera,386.58,883.59,452,SUP017
+P0279,Tablet Century,Electronics,Tablet,438.81,879.13,305,SUP013
+P0280,Jeans Pressure,Clothing,Jeans,94.52,198.56,319,SUP026
+P0281,Shoes What,Clothing,Shoes,26.63,44.57,368,SUP008
+P0282,Running Shoes Especially,Sports,Running Shoes,377.43,837.49,119,SUP018
+P0283,Jacket Ability,Clothing,Jacket,482.97,1072.04,462,SUP027
+P0284,Jacket Series,Clothing,Jacket,340.76,661.6,225,SUP015
+P0285,Pillow Husband,Home,Pillow,253.94,442.94,82,SUP027
+P0286,Dress Born,Clothing,Dress,73.51,112.1,328,SUP016
+P0287,Frame Quite,Home,Frame,467.48,993.31,264,SUP028
+P0288,Tablet When,Electronics,Tablet,46.52,65.52,230,SUP029
+P0289,Non-Fiction Another,Books,Non-Fiction,416.37,549.29,466,SUP008
+P0290,Running Shoes Concern,Sports,Running Shoes,465.58,809.81,202,SUP017
+P0291,Lamp Standard,Home,Lamp,196.15,256.19,114,SUP001
+P0292,Sofa Town,Home,Sofa,420.39,859.68,405,SUP005
+P0293,T-Shirt Artist,Clothing,T-Shirt,147.01,334.99,356,SUP027
+P0294,Shoes Instead,Clothing,Shoes,227.06,274.02,40,SUP001
+P0295,Lamp Wind,Home,Lamp,418.31,800.41,372,SUP020
+P0296,Comic Record,Books,Comic,60.04,94.53,154,SUP004
+P0297,Phone Alone,Electronics,Phone,212.81,475.01,234,SUP003
+P0298,Headphones Director,Electronics,Headphones,300.39,366.89,263,SUP019
+P0299,Jeans Model,Clothing,Jeans,149.18,179.32,180,SUP008
+P0300,Comic Away,Books,Comic,97.72,202.15,268,SUP012
