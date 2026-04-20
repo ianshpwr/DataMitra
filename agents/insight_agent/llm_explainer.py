@@ -2,6 +2,7 @@ import os
 import json
 from groq import Groq
 from dotenv import load_dotenv
+import numpy as np  # ✅ added
 
 from .models import Insight, InsightType, InsightSeverity, StatEvidence
 from ..data_agent.models import DataContext
@@ -11,13 +12,44 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# llama-3.1-8b  → fast screening (free, ~600 tokens/sec)
-# llama-3.3-70b → deep reasoning (free, ~250 tokens/sec)
 FAST_MODEL = "llama-3.1-8b-instant"
 DEEP_MODEL = "llama-3.3-70b-versatile"
 
 _total_tokens = 0
 
+
+def _sanitize_value(v):
+    """
+    Ensures value passed to StatEvidence is valid (float/int/str).
+    Handles list, dict, and other complex types safely.
+    """
+
+    # ✅ CASE 1: list → mean
+    if isinstance(v, list):
+        try:
+            return float(sum(v) / len(v)) if len(v) > 0 else 0.0
+        except Exception:
+            return str(v)
+
+    # ✅ CASE 2: dict → pick best representative value
+    if isinstance(v, dict):
+        # priority order (very important for analytics clarity)
+        for key in ["mean", "avg", "median", "value", "count", "sum", "max", "min"]:
+            if key in v:
+                try:
+                    return float(v[key])
+                except Exception:
+                    return str(v[key])
+
+        # fallback
+        return str(v)
+
+    # ✅ CASE 3: already valid
+    if isinstance(v, (int, float, str)):
+        return v
+
+    # ✅ fallback for anything weird
+    return str(v)
 
 def explain_stat_result(
     stat: StatResult,
@@ -25,17 +57,14 @@ def explain_stat_result(
     insight_id: str,
     use_fast_model: bool = False,
 ) -> tuple[Insight, int]:
-    """
-    Converts one StatResult into an Insight with a natural language explanation.
-    Returns (Insight, tokens_used).
-    """
-    model  = FAST_MODEL if (use_fast_model or stat.severity == "info") else DEEP_MODEL
+
+    model = FAST_MODEL if (use_fast_model or stat.severity == "info") else DEEP_MODEL
     prompt = _build_prompt(stat, ctx)
 
     response = client.chat.completions.create(
         model=model,
         max_tokens=400,
-        temperature=0.3,       # low temp = consistent, factual explanations
+        temperature=0.3,
         messages=[
             {
                 "role": "system",
@@ -48,16 +77,17 @@ def explain_stat_result(
         ],
     )
 
-    raw_text    = response.choices[0].message.content.strip()
+    raw_text = response.choices[0].message.content.strip()
     tokens_used = response.usage.total_tokens
     _add_tokens(tokens_used)
 
     title, explanation = _parse_response(raw_text, stat)
 
+    # ✅ FIX APPLIED HERE
     evidence = [
         StatEvidence(
             metric=k,
-            value=v,
+            value=_sanitize_value(v),  # 🔥 critical fix
             column=stat.columns[0] if stat.columns else None,
         )
         for k, v in list(stat.metrics.items())[:4]
@@ -71,7 +101,7 @@ def explain_stat_result(
         explanation=explanation,
         evidence=evidence,
         affected_columns=stat.columns,
-        confidence=0.0,        # Critic Agent sets this later
+        confidence=0.0,
         actionable=stat.actionable,
         raw_stats=stat.metrics,
     ), tokens_used
@@ -81,10 +111,7 @@ def generate_executive_summary(
     insights: list[Insight],
     ctx: DataContext,
 ) -> tuple[str, int]:
-    """
-    3-sentence executive summary across all insights.
-    Always uses fast model — synthesis, not deep reasoning.
-    """
+
     insight_titles = "\n".join(
         f"- [{i.severity.upper()}] {i.title}" for i in insights[:8]
     )
@@ -96,11 +123,11 @@ Key findings:
 {insight_titles}
 
 Structure:
-- Sentence 1: Overall state of the data (one key metric or trend)
-- Sentence 2: The most critical issue or opportunity found
-- Sentence 3: The single most important next action
+- Sentence 1: Overall state of the data
+- Sentence 2: Most critical issue/opportunity
+- Sentence 3: Most important next action
 
-Output only the 3 sentences. No bullets, no headers, no preamble."""
+Output only the 3 sentences."""
 
     response = client.chat.completions.create(
         model=FAST_MODEL,
@@ -137,7 +164,6 @@ def _add_tokens(n: int):
 
 
 def _build_prompt(stat: StatResult, ctx: DataContext) -> str:
-    # Trim metrics to keep prompts short (saves tokens + speeds up response)
     safe_metrics = {
         k: v for k, v in list(stat.metrics.items())[:6]
         if not isinstance(v, list) or len(v) <= 5
@@ -151,33 +177,36 @@ Affected columns: {stat.columns}
 Statistics:
 {json.dumps(safe_metrics, indent=2)}
 
-Write exactly 2 lines — no labels, no prefixes:
-Line 1: One plain-English title sentence (max 12 words) summarising what was found
-Line 2: 2-3 sentences explaining the business impact and why it matters
+Write exactly 2 lines:
+Line 1: Title (max 12 words)
+Line 2: Explanation (2–3 sentences)
 
-Speak like a smart analyst talking to a CEO. No statistical jargon."""
-
+No jargon."""
 
 def _parse_response(text: str, stat: StatResult) -> tuple[str, str]:
     lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
+    # Strip markdown bold/italic the LLM sometimes adds
+    def clean(s: str) -> str:
+        import re
+        return re.sub(r'\*+', '', s).strip()
+
     if len(lines) >= 2:
-        return lines[0], " ".join(lines[1:])
+        return clean(lines[0]), clean(" ".join(lines[1:]))
     elif len(lines) == 1:
-        return lines[0], lines[0]
+        return clean(lines[0]), clean(lines[0])
     else:
         return (
             f"{stat.stat_type.replace('_', ' ').title()} in {stat.columns}",
             "A notable statistical pattern was detected in this data.",
         )
 
-
 def _map_type(stat_type: str) -> InsightType:
     return {
-        "summary":                  InsightType.summary,
-        "time_trend":               InsightType.trend,
-        "anomaly":                  InsightType.anomaly,
-        "correlation":              InsightType.correlation,
-        "distribution":             InsightType.distribution,
+        "summary": InsightType.summary,
+        "time_trend": InsightType.trend,
+        "anomaly": InsightType.anomaly,
+        "correlation": InsightType.correlation,
+        "distribution": InsightType.distribution,
         "categorical_distribution": InsightType.distribution,
-        "high_nulls":               InsightType.summary,
+        "high_nulls": InsightType.summary,
     }.get(stat_type, InsightType.summary)
