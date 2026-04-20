@@ -25,3 +25,6 @@ pydantic==2.7.1
 
 # Environment
 python-dotenv==1.0.1
+
+
+groq==0.11.0
