@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
 import time
+from charts import build_specs, render
+from agents.insight_agent.models import InsightBundle, Insight, InsightType, InsightSeverity, StatEvidence
+from agents.decision_agent.models import DecisionPack, Decision, ActionType, ImpactLevel
+
 
 API = "http://localhost:8000"
 
@@ -53,6 +57,81 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# ── Deserializers ─────────────────────────────────────────────────────────────
+
+def _rebuild_bundle(data: dict) -> InsightBundle:
+    from agents.insight_agent.models import Insight, InsightType, InsightSeverity, StatEvidence
+
+    insights = []
+    for ins in data.get("insights", []):
+        evidence = [
+            StatEvidence(metric=e["metric"], value=e["value"], column=e.get("column"))
+            for e in ins.get("evidence", [])
+        ]
+        insights.append(Insight(
+            id=ins["id"],
+            type=InsightType(ins["type"]),
+            severity=InsightSeverity(ins["severity"]),
+            title=ins["title"],
+            explanation=ins["explanation"],
+            evidence=evidence,
+            affected_columns=ins["affected_columns"],
+            confidence=ins["confidence"],
+            actionable=ins["actionable"],
+            raw_stats={},
+        ))
+
+    return InsightBundle(
+        domain=data["domain"],
+        source_type=data["source_type"],
+        total_rows=data["total_rows"],
+        insights=insights,
+        executive_summary=data["executive_summary"],
+        analysis_ms=data["processing_ms"],
+        llm_model_used="groq",
+        token_count=data["token_count"],
+    )
+
+
+def _rebuild_pack(data: dict) -> DecisionPack | None:
+    pack_data = data.get("decisions")
+    if not pack_data:
+        return None
+
+    decisions = []
+    for d in pack_data.get("decisions", []):
+        decisions.append(Decision(
+            id=d["id"],
+            insight_id=d["insight_id"],
+            action_type=ActionType(d["action_type"]),
+            title=d["title"],
+            what=d["what"],
+            why=d["why"],
+            expected_impact=d["expected_impact"],
+            impact_level=ImpactLevel(d["impact_level"]),
+            effort_level=ImpactLevel(d["effort_level"]),
+            priority_score=d["priority_score"],
+            risk_if_ignored=d["risk_if_ignored"],
+            owner=d.get("owner"),
+            kpi=d.get("kpi"),
+        ))
+
+    quick_wins = [d for d in decisions
+                  if d.impact_level in (ImpactLevel.high, ImpactLevel.medium)
+                  and d.effort_level == ImpactLevel.low]
+
+    return DecisionPack(
+        domain=data["domain"],
+        total_insights=data["total_rows"],
+        decisions=decisions,
+        top_priority=decisions[0] if decisions else None,
+        quick_wins=quick_wins,
+        summary=pack_data.get("summary", ""),
+        generation_ms=pack_data.get("generation_ms", 0),
+        token_count=pack_data.get("token_count", 0),
+    )
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def call_upload(file_bytes: bytes, filename: str) -> dict:
@@ -99,6 +178,7 @@ def render_insight(ins: dict):
   </div>
 </div>
 """, unsafe_allow_html=True)
+
 ACTION_ICON = {
     "investigate": "🔍",
     "fix":         "🔧",
@@ -195,7 +275,51 @@ def render_decisions(pack: dict):
 | KPI | `{d.get('kpi','—')}` |
 | Priority | `{priority_pct}%` |
 """)
-                
+
+
+def render_charts(data: dict, bundle, pack):
+    st.markdown("---")
+    st.markdown("## 📈 Data insights — visual evidence")
+    st.caption(
+        "Each chart is generated from the insight that triggered it — "
+        "showing the actual data behind every finding."
+    )
+
+    specs = build_specs(bundle, pack, data)
+
+    if not specs:
+        st.info("No visualizable insights in this analysis.")
+        return
+
+    for spec in specs:
+        fig = render(spec)
+        if fig is None:
+            continue
+
+        # Link chart to its insight/decision
+        if spec.insight_id:
+            matched = next(
+                (ins for ins in bundle.insights if ins.id == spec.insight_id),
+                None,
+            )
+            if matched:
+                sev_color = {
+                    "critical": "#ef4444",
+                    "warning":  "#f59e0b",
+                    "info":     "#6b7280",
+                }.get(matched.severity, "#6b7280")
+                st.markdown(
+                    f"<p style='font-size:11px;color:{sev_color};margin-bottom:4px'>"
+                    f"▸ Linked to [{matched.severity.upper()}] {matched.title}"
+                    f"</p>",
+                    unsafe_allow_html=True,
+                )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={"displayModeBar": False},
+        )
 
 
 def render_results(data: dict, filename: str):
@@ -275,11 +399,21 @@ def render_results(data: dict, filename: str):
             st.markdown(
                 f"{SEVERITY_ICON[sev]} **{sev.capitalize()}** — {cnt} "
                 f"`{'█' * bar_w}`"
-    
             )
+
     # Decisions
     if data.get("decisions"):
         render_decisions(data["decisions"])
+
+    # Charts — pass bundle and pack objects, not just the dict
+    bundle = None
+    pack   = None
+    if st.session_state.get("bundle"):
+        bundle = st.session_state["bundle"]
+    if st.session_state.get("pack"):
+        pack = st.session_state["pack"]
+    if bundle:
+        render_charts(data, bundle, pack)
 
 
 # ── Main UI ───────────────────────────────────────────────────────────────────
@@ -307,6 +441,8 @@ with tab_upload:
                     data = call_upload(uploaded.getvalue(), uploaded.name)
                     st.session_state["result"]   = data
                     st.session_state["filename"] = uploaded.name
+                    st.session_state["bundle"]   = _rebuild_bundle(data)
+                    st.session_state["pack"]     = _rebuild_pack(data)
                 except requests.HTTPError as e:
                     st.error(f"API error: {e.response.text}")
                 except Exception as e:
@@ -329,6 +465,8 @@ with tab_live:
                     data = call_live()
                     st.session_state["result"]   = data
                     st.session_state["filename"] = "live"
+                    st.session_state["bundle"]   = _rebuild_bundle(data)
+                    st.session_state["pack"]     = _rebuild_pack(data)
                     st.session_state["last_live"] = time.time()
                 except requests.HTTPError as e:
                     detail = e.response.json().get("detail", e.response.text)
@@ -351,6 +489,8 @@ with tab_live:
                     data = call_live()
                     st.session_state["result"]   = data
                     st.session_state["filename"] = "live"
+                    st.session_state["bundle"]   = _rebuild_bundle(data)
+                    st.session_state["pack"]     = _rebuild_pack(data)
                     st.session_state["last_live"] = time.time()
                     st.rerun()
                 except Exception:
