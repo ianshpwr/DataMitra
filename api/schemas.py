@@ -45,6 +45,7 @@ class AnalysisResponse(BaseModel):
     processing_ms:     int
     token_count:       int
     analysed_at:       datetime
+    decisions: Optional[DecisionPackOut] = None 
 
 class ErrorResponse(BaseModel):
     success: bool = False

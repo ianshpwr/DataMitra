@@ -4,7 +4,7 @@ Wires DataAgent → InsightAgent → CriticAgent into a state machine
 with conditional routing and retry logic.
 """
 import polars as pl
-from typing import Optional, Annotated
+from typing import Optional, Annotated, Any
 from typing_extensions import TypedDict
 
 from langgraph.graph import StateGraph, END
@@ -114,71 +114,62 @@ def flag_for_review(state: PipelineState) -> PipelineState:
 # ── Routing logic ─────────────────────────────────────────────────────────────
 
 MAX_RETRIES = 3
-
 def route_after_critic(state: PipelineState) -> str:
-    """
-    Decides where to go after the Critic Agent runs.
-    Returns a node name — LangGraph uses this to pick the next step.
-    """
     if state.get("error"):
-        return "output"   # fail gracefully with whatever we have
+        return "decision_agent"
 
     report = state.get("critic_report")
     if report is None:
-        return "output"
+        return "decision_agent"
 
     retry_count = state.get("retry_count", 0)
 
-    # Retry path: Critic says quality is low AND we haven't hit max retries
     if report.retry_recommended and retry_count < MAX_RETRIES:
         print(f"[Pipeline] Router: retry ({retry_count + 1}/{MAX_RETRIES}) — "
               f"{report.retry_reason}")
         state["retry_count"] = retry_count + 1
-        return "insight_agent"   # re-run insight agent with same data
+        return "insight_agent"
 
-    # Human review path: passed but low confidence on several insights
-    if report.needs_human_review:
-        return "human_review"
-
-    # Happy path
-    return "output"
-
+    return "decision_agent"
 
 # ── Graph assembly ─────────────────────────────────────────────────────────────
-
 def build_pipeline() -> StateGraph:
     graph = StateGraph(PipelineState)
 
-    # Register nodes
-    graph.add_node("data_agent",    run_data_agent)
-    graph.add_node("insight_agent", run_insight_agent)
-    graph.add_node("critic_agent",  run_critic_agent)
+    graph.add_node("data_agent",     run_data_agent)
+    graph.add_node("insight_agent",  run_insight_agent)
+    graph.add_node("critic_agent",   run_critic_agent)
     graph.add_node("decision_agent", run_decision_agent)
-    graph.add_node("output",        finalize_output)
-    graph.add_node("human_review",  flag_for_review)
+    graph.add_node("output",         finalize_output)
+    graph.add_node("human_review",   flag_for_review)
 
-    # Edges
     graph.set_entry_point("data_agent")
     graph.add_edge("data_agent",    "insight_agent")
     graph.add_edge("insight_agent", "critic_agent")
     graph.add_edge("output",        END)
     graph.add_edge("human_review",  END)
 
-    # Conditional routing after Critic
+    # Critic → decision_agent OR retry back to insight_agent
     graph.add_conditional_edges(
-            "critic_agent",
-            route_after_critic,
-            {
-                "insight_agent":  "insight_agent",
-                "output":         "decision_agent",    # changed: critic → decision
-                "human_review":   "decision_agent",    # changed: review → decision
-            },
-        )
-    graph.add_edge("decision_agent", "output")
+        "critic_agent",
+        route_after_critic,
+        {
+            "insight_agent":  "insight_agent",
+            "decision_agent": "decision_agent",
+        },
+    )
 
+    # Decision agent → output OR human_review
+    graph.add_conditional_edges(
+        "decision_agent",
+        lambda s: "human_review" if s.get("needs_review") else "output",
+        {
+            "output":        "output",
+            "human_review":  "human_review",
+        },
+    )
 
     return graph.compile()
-
 
 # ── Public entry point ────────────────────────────────────────────────────────
 
@@ -197,6 +188,7 @@ def run_static_pipeline(file_path: str, use_sample: bool = False) -> PipelineSta
         "error":        None,
         "needs_review": False,
         "completed":    False,
+        "decision_pack": None,
     }
     return pipeline.invoke(initial_state)
 
@@ -216,6 +208,7 @@ def run_live_pipeline() -> PipelineState:
         "error":        None,
         "needs_review": False,
         "completed":    False,
+        "decision_pack": None,
         
     }
     return pipeline.invoke(initial_state)

@@ -11,6 +11,7 @@ from agents.pipeline import run_static_pipeline, run_live_pipeline
 from api.schemas import (
     AnalysisResponse, ErrorResponse,
     InsightOut, EvidenceOut, QualityReportOut, CriticReportOut,
+    DecisionOut, DecisionPackOut,   # ✅ ADDED
 )
 
 router = APIRouter(prefix="/api/v1", tags=["analysis"])
@@ -30,7 +31,6 @@ async def analyse_upload(
     file:       UploadFile = File(...),
     use_sample: bool       = Query(False, description="Use 10k row sample for speed"),
 ):
-    # Validate extension
     ext = os.path.splitext(file.filename or "")[-1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
@@ -38,7 +38,6 @@ async def analyse_upload(
             detail=f"Unsupported file type '{ext}'. Allowed: {ALLOWED_EXTENSIONS}",
         )
 
-    # Validate size
     content = await file.read()
     size_mb = len(content) / (1024 * 1024)
     if size_mb > MAX_FILE_MB:
@@ -47,7 +46,6 @@ async def analyse_upload(
             detail=f"File too large ({size_mb:.1f} MB). Max: {MAX_FILE_MB} MB",
         )
 
-    # Write to a temp file (pipeline expects a file path)
     with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
         tmp.write(content)
         tmp_path = tmp.name
@@ -59,7 +57,7 @@ async def analyse_upload(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        os.unlink(tmp_path)   # always clean up
+        os.unlink(tmp_path)
 
     if result.get("error"):
         raise HTTPException(status_code=500, detail=result["error"])
@@ -67,7 +65,7 @@ async def analyse_upload(
     return _build_response(result, elapsed_ms)
 
 
-# ── Analyse a file already on the server by path ─────────────────────────────
+# ── Analyse a file already on the server ─────────────────────────────
 
 @router.post(
     "/analyse/path",
@@ -94,7 +92,7 @@ async def analyse_path(
     return _build_response(result, elapsed_ms)
 
 
-# ── Analyse a batch from the live stream ─────────────────────────────────────
+# ── Analyse a batch from the live stream ─────────────────────────────
 
 @router.post(
     "/analyse/live",
@@ -112,7 +110,7 @@ async def analyse_live():
     if result.get("error"):
         raise HTTPException(
             status_code=503,
-            detail=result["error"],   # e.g. "No live data available"
+            detail=result["error"],
         )
 
     return _build_response(result, elapsed_ms)
@@ -143,6 +141,37 @@ def _build_response(result: dict, elapsed_ms: int) -> AnalysisResponse:
         for ins in bundle.insights
     ]
 
+    # ── ✅ NEW: Decision Pack Mapping ───────────────────────────────────────
+    decisions_out = None
+    pack = result.get("decision_pack")
+
+    if pack:
+        def _dec(d):
+            return DecisionOut(
+                id=d.id,
+                insight_id=d.insight_id,
+                action_type=d.action_type.value,
+                title=d.title,
+                what=d.what,
+                why=d.why,
+                expected_impact=d.expected_impact,
+                impact_level=d.impact_level.value,
+                effort_level=d.effort_level.value,
+                priority_score=d.priority_score,
+                risk_if_ignored=d.risk_if_ignored,
+                owner=d.owner,
+                kpi=d.kpi,
+            )
+
+        decisions_out = DecisionPackOut(
+            total_insights=pack.total_insights,
+            decisions=[_dec(d) for d in pack.decisions],
+            quick_wins=[_dec(d) for d in pack.quick_wins],
+            summary=pack.summary,
+            generation_ms=pack.generation_ms,
+            token_count=pack.token_count,
+        )
+
     return AnalysisResponse(
         success=True,
         domain=bundle.domain,
@@ -168,4 +197,5 @@ def _build_response(result: dict, elapsed_ms: int) -> AnalysisResponse:
         processing_ms=elapsed_ms,
         token_count=bundle.token_count,
         analysed_at=datetime.now(timezone.utc),
+        decisions=decisions_out,
     )

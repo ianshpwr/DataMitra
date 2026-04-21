@@ -99,6 +99,103 @@ def render_insight(ins: dict):
   </div>
 </div>
 """, unsafe_allow_html=True)
+ACTION_ICON = {
+    "investigate": "🔍",
+    "fix":         "🔧",
+    "optimise":    "🚀",
+    "monitor":     "👁️",
+    "escalate":    "🚨",
+}
+IMPACT_COLOR = {
+    "high":   "#ef4444",
+    "medium": "#f59e0b",
+    "low":    "#6b7280",
+}
+
+def render_decisions(pack: dict):
+    st.markdown("---")
+    st.markdown("## 🎯 Recommended actions")
+
+    # Action summary banner
+    if pack.get("summary"):
+        st.markdown(f"""
+<div style="background:#0d2a1f;border:1px solid #16a34a;border-radius:10px;
+            padding:16px 20px;margin-bottom:20px">
+  <p style="font-size:11px;font-weight:600;color:#4ade80;letter-spacing:0.08em;
+            text-transform:uppercase;margin-bottom:8px">Action plan</p>
+  <p style="font-size:15px;line-height:1.7;color:#dcfce7;margin:0">
+    {pack['summary']}
+  </p>
+</div>
+""", unsafe_allow_html=True)
+
+    decisions = pack.get("decisions", [])
+    if not decisions:
+        st.info("No decisions generated — no actionable insights found.")
+        return
+
+    # Quick wins section
+    quick_wins = pack.get("quick_wins", [])
+    if quick_wins:
+        st.markdown(f"#### ⚡ Quick wins ({len(quick_wins)})")
+        st.caption("High/medium impact · Low effort · Do these first")
+        cols = st.columns(min(len(quick_wins), 3))
+        for i, d in enumerate(quick_wins[:3]):
+            with cols[i]:
+                st.markdown(f"""
+<div style="background:#1a1f2e;border:1px solid #2d3150;border-radius:8px;padding:14px">
+  <p style="font-size:11px;color:#60a5fa;font-weight:600;margin-bottom:6px">
+    {ACTION_ICON.get(d['action_type'], '•')} {d['action_type'].upper()}
+  </p>
+  <p style="font-weight:600;font-size:13px;color:#e2e8f0;margin-bottom:8px">
+    {d['title']}
+  </p>
+  <p style="font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:8px">
+    {d['what'][:120]}...
+  </p>
+  <p style="font-size:11px;color:#4ade80">
+    Impact: {d['impact_level']} · Owner: {d.get('owner','—')}
+  </p>
+</div>
+""", unsafe_allow_html=True)
+        st.markdown("")
+
+    # All decisions
+    st.markdown(f"#### All decisions ({len(decisions)})")
+    for d in decisions:
+        priority_pct = int(d['priority_score'] * 100)
+        impact_col   = IMPACT_COLOR.get(d['impact_level'], '#6b7280')
+
+        with st.expander(
+            f"{ACTION_ICON.get(d['action_type'], '•')}  {d['title']}  "
+            f"— priority {priority_pct}%",
+            expanded=d['priority_score'] > 0.7,
+        ):
+            col_l, col_r = st.columns([2, 1])
+
+            with col_l:
+                st.markdown(f"**What to do**")
+                st.markdown(d['what'])
+                st.markdown(f"**Why**")
+                st.markdown(d['why'])
+                st.markdown(f"**Expected impact**")
+                st.markdown(d['expected_impact'])
+                st.markdown(
+                    f"**Risk if ignored:** _{d['risk_if_ignored']}_"
+                )
+
+            with col_r:
+                st.markdown(f"""
+| | |
+|---|---|
+| Action | `{d['action_type']}` |
+| Impact | `{d['impact_level']}` |
+| Effort | `{d['effort_level']}` |
+| Owner | `{d.get('owner','—')}` |
+| KPI | `{d.get('kpi','—')}` |
+| Priority | `{priority_pct}%` |
+""")
+                
 
 
 def render_results(data: dict, filename: str):
@@ -178,7 +275,11 @@ def render_results(data: dict, filename: str):
             st.markdown(
                 f"{SEVERITY_ICON[sev]} **{sev.capitalize()}** — {cnt} "
                 f"`{'█' * bar_w}`"
+    
             )
+    # Decisions
+    if data.get("decisions"):
+        render_decisions(data["decisions"])
 
 
 # ── Main UI ───────────────────────────────────────────────────────────────────
