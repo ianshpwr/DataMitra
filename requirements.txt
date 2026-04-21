@@ -36,3 +36,4 @@ groq==0.11.0
 fastapi==0.111.0
 uvicorn==0.29.0
 python-multipart==0.0.9
+plotly==5.22.0
