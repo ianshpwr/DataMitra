@@ -16,7 +16,8 @@ from agents.insight_agent.agent import InsightAgent
 from agents.insight_agent.models import InsightBundle
 from agents.critic_agent.agent  import CriticAgent
 from agents.critic_agent.models import CriticReport
-
+from agents.decision_agent.agent  import DecisionAgent
+from agents.decision_agent.models import DecisionPack
 # ── Pipeline state definition ─────────────────────────────────────────────────
 # Everything the pipeline needs to pass between nodes lives here.
 # LangGraph serialises this between steps.
@@ -33,6 +34,7 @@ class PipelineState(TypedDict):
     raw_bundle:     Optional[InsightBundle]
     final_bundle:   Optional[InsightBundle]
     critic_report:  Optional[CriticReport]
+    decision_pack:  Optional[Any] 
 
     # Control flow
     retry_count:    int
@@ -46,6 +48,8 @@ class PipelineState(TypedDict):
 _data_agent    = DataProcessingAgent()
 _insight_agent = InsightAgent()
 _critic_agent  = CriticAgent()
+_decision_agent = DecisionAgent()
+
 
 
 def run_data_agent(state: PipelineState) -> PipelineState:
@@ -149,6 +153,7 @@ def build_pipeline() -> StateGraph:
     graph.add_node("data_agent",    run_data_agent)
     graph.add_node("insight_agent", run_insight_agent)
     graph.add_node("critic_agent",  run_critic_agent)
+    graph.add_node("decision_agent", run_decision_agent)
     graph.add_node("output",        finalize_output)
     graph.add_node("human_review",  flag_for_review)
 
@@ -161,14 +166,16 @@ def build_pipeline() -> StateGraph:
 
     # Conditional routing after Critic
     graph.add_conditional_edges(
-        "critic_agent",
-        route_after_critic,
-        {
-            "insight_agent": "insight_agent",  # retry loop
-            "output":        "output",
-            "human_review":  "human_review",
-        },
-    )
+            "critic_agent",
+            route_after_critic,
+            {
+                "insight_agent":  "insight_agent",
+                "output":         "decision_agent",    # changed: critic → decision
+                "human_review":   "decision_agent",    # changed: review → decision
+            },
+        )
+    graph.add_edge("decision_agent", "output")
+
 
     return graph.compile()
 
@@ -209,5 +216,19 @@ def run_live_pipeline() -> PipelineState:
         "error":        None,
         "needs_review": False,
         "completed":    False,
+        
     }
     return pipeline.invoke(initial_state)
+
+def run_decision_agent(state: PipelineState) -> PipelineState:
+    print(f"[Pipeline] Node: decision_agent")
+    try:
+        pack = _decision_agent.run(
+            state["final_bundle"],
+            state["data_ctx"],
+        )
+        return {**state, "decision_pack": pack}
+    except Exception as e:
+        # Decision agent failure is non-fatal — pipeline continues
+        print(f"[Pipeline] Warning: DecisionAgent failed: {e}")
+        return {**state, "decision_pack": None}
