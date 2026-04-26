@@ -3,6 +3,60 @@ import numpy as np
 from scipy import stats as scipy_stats
 from dataclasses import dataclass, field
 
+
+def _is_non_analytical_column(col: str, series) -> bool:
+    """
+    Returns True if this column should be excluded from analysis.
+    Covers: IDs, geo coordinates, timestamps, postal codes.
+    """
+    col_lower = col.lower()
+
+    # ID columns
+    if any(col_lower.endswith(s) for s in ["_id", "id", "_key", "_uuid", "_index"]):
+        return True
+    if col_lower in {"id", "index", "uuid", "key", "idx"}:
+        return True
+
+    # Geo coordinate columns — never useful as distributions
+    if any(k in col_lower for k in [
+        "lat", "lng", "lon", "latitude", "longitude",
+        "pickup_lat", "pickup_lng", "dropoff_lat", "dropoff_lng",
+        "x_coord", "y_coord", "coordinates", "geoloc"
+    ]):
+        return True
+
+    # Postal/zip codes
+    if any(k in col_lower for k in ["zip", "postal", "pincode", "postcode"]):
+        return True
+
+    # Raw timestamp columns used as indexes
+    if any(k in col_lower for k in [
+        "created_at", "updated_at", "timestamp", "datetime",
+        "pickup_datetime", "dropoff_datetime", "event_time"
+    ]):
+        return True
+
+    # High cardinality numeric = likely an ID or coordinate
+    if str(series.dtype) in ("Int64", "Int32", "Int16", "Int8"):
+        unique_ratio = series.n_unique() / max(len(series), 1)
+        if unique_ratio > 0.8:
+            return True
+
+    # Float column where ALL values are in coordinate range (-180 to 180)
+    # and high cardinality = geo coordinate
+    if str(series.dtype) in ("Float64", "Float32"):
+        unique_ratio = series.n_unique() / max(len(series), 1)
+        if unique_ratio > 0.9:
+            try:
+                col_min = float(series.min() or 0)
+                col_max = float(series.max() or 0)
+                if -180 <= col_min and col_max <= 180:
+                    return True
+            except Exception:
+                pass
+
+    return False
+
 @dataclass
 class StatResult:
     """One discovered statistical fact."""
@@ -18,8 +72,14 @@ def run_full_analysis(df: pl.DataFrame, domain: str) -> list[StatResult]:
     Entry point. Runs all statistical checks and returns a flat
     list of StatResults, ordered by severity (critical first).
     """
-    results: list[StatResult] = []
+    # Remove non-analytical columns (IDs, coords, timestamps, postal codes)
+    useful_cols = [
+        c for c in df.columns
+        if not _is_non_analytical_column(c, df[c])
+    ]
+    df = df.select(useful_cols)
 
+    results: list[StatResult] = []
     results += _summary_stats(df)
     results += _null_analysis(df)
     results += _numeric_distributions(df)
@@ -28,7 +88,6 @@ def run_full_analysis(df: pl.DataFrame, domain: str) -> list[StatResult]:
     results += _correlations(df)
     results += _anomaly_detection(df)
 
-    # sort: critical → warning → info
     order = {"critical": 0, "warning": 1, "info": 2}
     results.sort(key=lambda r: order.get(r.severity, 3))
     return results

@@ -198,4 +198,7 @@ def _build_response(result: dict, elapsed_ms: int) -> AnalysisResponse:
         token_count=bundle.token_count,
         analysed_at=datetime.now(timezone.utc),
         decisions=decisions_out,
+        # add to AnalysisResponse call:
+        chart_plans=result.get("chart_plans", []),
+        df_path=result.get("df_path"),
     )

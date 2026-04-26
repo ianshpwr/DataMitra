@@ -1,12 +1,16 @@
+import os
 import streamlit as st
 import requests
 import time
-from charts import build_specs, render
+from charts.renderer import render_from_data
+from agents.chart_agent.models import ChartPlan
+import polars as pl
 from agents.insight_agent.models import InsightBundle, Insight, InsightType, InsightSeverity, StatEvidence
 from agents.decision_agent.models import DecisionPack, Decision, ActionType, ImpactLevel
 
-
-API = "http://localhost:8000"
+# On Streamlit Cloud: set DATAMITRA_API_URL in App Secrets to your Render URL
+# e.g. https://datamitra-api.onrender.com
+API = os.getenv("DATAMITRA_API_URL", "http://localhost:8000").rstrip("/")
 
 st.set_page_config(
     page_title="DataMitra",
@@ -275,53 +279,101 @@ def render_decisions(pack: dict):
 | KPI | `{d.get('kpi','—')}` |
 | Priority | `{priority_pct}%` |
 """)
+def render_charts(data: dict):
+    plans   = st.session_state.get("chart_plans", [])
+    df_path = st.session_state.get("df_path")
 
-
-def render_charts(data: dict, bundle, pack):
-    st.markdown("---")
-    st.markdown("## 📈 Data insights — visual evidence")
-    st.caption(
-        "Each chart is generated from the insight that triggered it — "
-        "showing the actual data behind every finding."
-    )
-
-    specs = build_specs(bundle, pack, data)
-
-    if not specs:
-        st.info("No visualizable insights in this analysis.")
+    if not plans:
+        return
+    if not df_path:
         return
 
-    for spec in specs:
-        fig = render(spec)
+    import os
+    if not os.path.exists(df_path):
+        return
+
+    try:
+        import polars as pl
+        df = pl.read_parquet(df_path)
+    except Exception as e:
+        st.error(f"Could not load chart data: {e}")
+        return
+
+    st.markdown("---")
+    st.markdown("## 📈 Data insights — visual evidence")
+    st.caption(f"Charts selected by AI · {len(plans)} generated")
+
+    # Build insight map as plain dicts — consistent access
+    insights_map = {}
+    for ins in data.get("insights", []):
+        if isinstance(ins, dict):
+            insights_map[ins["id"]] = ins
+        else:
+            # Pydantic object — convert to dict
+            insights_map[ins.id] = {
+                "id":       ins.id,
+                "severity": ins.severity if isinstance(ins.severity, str)
+                            else ins.severity.value,
+                "title":    ins.title,
+            }
+
+    SEV_COLOR = {
+        "critical": "#ef4444",
+        "warning":  "#f59e0b",
+        "info":     "#6b7280",
+    }
+
+    rendered = 0
+    for plan_raw in plans:
+        # Always work with ChartPlan object
+        try:
+            from agents.chart_agent.models import ChartPlan
+            plan = ChartPlan(**plan_raw) if isinstance(plan_raw, dict) else plan_raw
+        except Exception as e:
+            print(f"[UI] ChartPlan reconstruct failed: {e}")
+            continue
+
+        if plan.skip:
+            continue
+
+        from charts.renderer import render_from_data
+        try:
+            fig = render_from_data(plan, df)
+        except Exception as e:
+            print(f"[UI] Render failed for {plan.insight_id}: {e}")
+            continue
+
         if fig is None:
             continue
 
-        # Link chart to its insight/decision
-        if spec.insight_id:
-            matched = next(
-                (ins for ins in bundle.insights if ins.id == spec.insight_id),
-                None,
+        # Insight label — always access as dict
+        ins = insights_map.get(plan.insight_id)
+        if ins:
+            sev   = ins["severity"]
+            color = SEV_COLOR.get(sev, "#6b7280")
+            st.markdown(
+                f"<p style='font-size:11px;color:{color};"
+                f"margin-bottom:2px;margin-top:20px'>"
+                f"▸ [{sev.upper()}] {ins['title']}</p>",
+                unsafe_allow_html=True,
             )
-            if matched:
-                sev_color = {
-                    "critical": "#ef4444",
-                    "warning":  "#f59e0b",
-                    "info":     "#6b7280",
-                }.get(matched.severity, "#6b7280")
-                st.markdown(
-                    f"<p style='font-size:11px;color:{sev_color};margin-bottom:4px'>"
-                    f"▸ Linked to [{matched.severity.upper()}] {matched.title}"
-                    f"</p>",
-                    unsafe_allow_html=True,
-                )
+
+        if plan.reasoning:
+            st.caption(f"Why this chart: {plan.reasoning}")
 
         st.plotly_chart(
             fig,
             use_container_width=True,
             config={"displayModeBar": False},
         )
+        rendered += 1
+
+    if rendered == 0:
+        st.info("Charts planned but could not be rendered.")
 
 
+
+        
 def render_results(data: dict, filename: str):
     # ── Top meta row ─────────────────────────────────────────────────────────
     st.markdown(f"<p style='font-size:13px;color:#6b7280'>Results for <b>{filename}</b></p>",
@@ -404,16 +456,9 @@ def render_results(data: dict, filename: str):
     # Decisions
     if data.get("decisions"):
         render_decisions(data["decisions"])
-
-    # Charts — pass bundle and pack objects, not just the dict
-    bundle = None
-    pack   = None
-    if st.session_state.get("bundle"):
-        bundle = st.session_state["bundle"]
-    if st.session_state.get("pack"):
-        pack = st.session_state["pack"]
-    if bundle:
-        render_charts(data, bundle, pack)
+        
+    # Charts
+    render_charts(data)
 
 
 # ── Main UI ───────────────────────────────────────────────────────────────────
@@ -439,10 +484,13 @@ with tab_upload:
             with st.spinner("Running pipeline — Data Agent → Insight Agent → Critic Agent…"):
                 try:
                     data = call_upload(uploaded.getvalue(), uploaded.name)
-                    st.session_state["result"]   = data
-                    st.session_state["filename"] = uploaded.name
-                    st.session_state["bundle"]   = _rebuild_bundle(data)
-                    st.session_state["pack"]     = _rebuild_pack(data)
+
+                    st.session_state["result"]      = data
+                    st.session_state["filename"]    = uploaded.name
+                    st.session_state["bundle"]      = _rebuild_bundle(data)
+                    st.session_state["pack"]        = _rebuild_pack(data)
+                    st.session_state["chart_plans"] = data.get("chart_plans", [])
+                    st.session_state["df_path"]     = data.get("df_path")
                 except requests.HTTPError as e:
                     st.error(f"API error: {e.response.text}")
                 except Exception as e:
@@ -463,11 +511,14 @@ with tab_live:
             with st.spinner("Pulling live batch…"):
                 try:
                     data = call_live()
-                    st.session_state["result"]   = data
-                    st.session_state["filename"] = "live"
-                    st.session_state["bundle"]   = _rebuild_bundle(data)
-                    st.session_state["pack"]     = _rebuild_pack(data)
-                    st.session_state["last_live"] = time.time()
+
+                    st.session_state["result"]      = data
+                    st.session_state["filename"]    = "live"
+                    st.session_state["bundle"]      = _rebuild_bundle(data)
+                    st.session_state["pack"]        = _rebuild_pack(data)
+                    st.session_state["chart_plans"] = data.get("chart_plans", [])
+                    st.session_state["df_path"]     = data.get("df_path")
+                    st.session_state["last_live"]   = time.time()
                 except requests.HTTPError as e:
                     detail = e.response.json().get("detail", e.response.text)
                     st.error(f"{detail}")
@@ -487,11 +538,14 @@ with tab_live:
             with st.spinner("Auto-refreshing…"):
                 try:
                     data = call_live()
-                    st.session_state["result"]   = data
-                    st.session_state["filename"] = "live"
-                    st.session_state["bundle"]   = _rebuild_bundle(data)
-                    st.session_state["pack"]     = _rebuild_pack(data)
-                    st.session_state["last_live"] = time.time()
+
+                    st.session_state["result"]      = data
+                    st.session_state["filename"]    = "live"
+                    st.session_state["bundle"]      = _rebuild_bundle(data)
+                    st.session_state["pack"]        = _rebuild_pack(data)
+                    st.session_state["chart_plans"] = data.get("chart_plans", [])
+                    st.session_state["df_path"]     = data.get("df_path")
+                    st.session_state["last_live"]   = time.time()
                     st.rerun()
                 except Exception:
                     pass

@@ -80,6 +80,8 @@ class AnalysisResponse(BaseModel):
     processing_ms:     int
     token_count:       int
     analysed_at:       datetime
+    chart_plans: list = []
+    df_path:     Optional[str] = None
 
 
 class ErrorResponse(BaseModel):

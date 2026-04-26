@@ -21,3 +21,8 @@ dump.rdb
 # Test artifacts
 .pytest_cache/
 
+# Streamlit secrets (real file — never commit)
+.streamlit/secrets.toml
+
+# Temp parquet files written by the pipeline
+datamitra_*.parquet

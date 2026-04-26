@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: datamitra-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false          # fill in Render dashboard — never commit this
+      - key: ALLOWED_ORIGINS
+        sync: false          # set to your Streamlit Cloud URL after first deploy
+      - key: PYTHON_VERSION
+        value: "3.11"

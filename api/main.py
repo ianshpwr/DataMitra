@@ -19,11 +19,16 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Allow React dev server on port 3000 to call the API
+# Allow Streamlit Cloud + local dev to call the API.
+# Set ALLOWED_ORIGINS in Render env vars to lock this down in production,
+# e.g. "https://your-app.streamlit.app,http://localhost:8501"
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "*")
+_origins = [o.strip() for o in _raw_origins.split(",")] if _raw_origins != "*" else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-    allow_credentials=True,
+    allow_origins=_origins,
+    allow_credentials=_raw_origins != "*",
     allow_methods=["*"],
     allow_headers=["*"],
 )
